@@ -1,0 +1,69 @@
+diff -burN SDL2_image-2.0.5/config.sub SDL2_image-2.0.5-psp/config.sub
+--- SDL2_image-2.0.5/config.sub	2019-06-30 06:52:03.000000000 +0200
++++ SDL2_image-2.0.5-psp/config.sub	2019-12-29 21:39:06.000000000 +0100
+@@ -1049,6 +1049,10 @@
+ 	ps2)
+ 		basic_machine=i386-ibm
+ 		;;
++	psp)
++		basic_machine=mipsallegrexel-psp
++		os=-elf
++		;;
+ 	pw32)
+ 		basic_machine=i586-unknown
+ 		os=-pw32
+diff -burN SDL2_image-2.0.5/configure.in SDL2_image-2.0.5-psp/configure.in
+--- SDL2_image-2.0.5/configure.in	2019-06-30 06:52:03.000000000 +0200
++++ SDL2_image-2.0.5-psp/configure.in	2019-12-29 21:40:30.000000000 +0100
+@@ -58,10 +58,35 @@
+ fi
+ AC_CHECK_PROGS(WINDRES, [windres $hostaliaswindres $host_os-windres])
+ 
++dnl Check for a valid PSPSDK installation
++CheckPSPSDK()
++{   
++    AC_CHECK_PROG(psp_config, psp-config, psp-config, no)
++    if test x$psp_config = xno; then
++        AC_MSG_ERROR(Couldn't locate psp-config.)
++    fi
++
++    AC_MSG_CHECKING(for PSPSDK)
++    pspsdk_path=`$psp_config --pspsdk-path`
++    if test ! -d $pspsdk_path -o -z $pspsdk_path; then
++        AC_MSG_RESULT(not found)
++        AC_MSG_ERROR(Couldn't locate PSPSDK.)
++    fi
++    AC_MSG_RESULT($pspsdk_path)
++   
++    # Compile SDL with -G0 to disable the $gp register.
++    CFLAGS="$CFLAGS -G0 -I\"${pspsdk_path}/include\""
++    BUILD_PREFIX="psp-"
++}
++
+ case "$host" in
+     *-*-beos*)
+         ac_default_prefix=/boot/develop/tools/gnupro
+         ;;
++    *-psp-*)
++        ARCH=psp
++        CheckPSPSDK
++        ;;
+     *-*-cygwin* | *-*-mingw32*)
+         if test "$build" != "$host"; then # cross-compiling
+             # Default cross-compile location
+diff -burN SDL2_image-2.0.5/README.psp SDL2_image-2.0.5-psp/README.psp
+--- SDL2_image-2.0.5/README.psp	1970-01-01 01:00:00.000000000 +0100
++++ SDL2_image-2.0.5-psp/README.psp	2019-12-29 21:50:43.000000000 +0100
+@@ -0,0 +1,11 @@
++To configure:
++
++   ./autogen.sh
++   LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" \
++     ./configure --host psp --with-sdl-prefix=$(psp-config --psp-prefix) \
++     --prefix=$(psp-config --psp-prefix)
++
++Then run:
++
++   make
++   make install
+\ No newline at end of file
