@@ -1,4 +1,6 @@
-download_and_extract http://www.libsdl.org/release/SDL2-2.0.8.tar.gz SDL2-2.0.8
+SDL2_STR=SDL2-2.0.5
+
+download_and_extract http://www.libsdl.org/release/${SDL2_STR}.tar.gz ${SDL2_STR}
 make -f Makefile.psp -j `num_cpus`
 
 cp -v *.a $(psp-config --psp-prefix)/lib

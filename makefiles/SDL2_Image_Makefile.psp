@@ -1,0 +1,34 @@
+TARGET_LIB  = libSDL2_image.a
+OBJS = IMG.o \
+	IMG_bmp.o \
+	IMG_gif.o \
+	IMG_jpg.o \
+	IMG_lbm.o \
+	IMG_pcx.o \
+	IMG_png.o \
+	IMG_pnm.o \
+	IMG_tga.o \
+	IMG_tif.o \
+	IMG_webp.o \
+	IMG_xcf.o \
+	IMG_xpm.o \
+	IMG_xv.o \
+	IMG_xxx.o \
+	showimage.o
+
+PSPPREFIX=$(shell psp-config --psp-prefix)
+
+INCDIR = ./include
+CFLAGS = -g -O2 -G0 -Wall -D__PSP__ -DHAVE_OPENGL -I$(PSPPREFIX)/include/SDL2 -DLOAD_BMP \
+				-DLOAD_GIF -DLOAD_LBM -DLOAD_PCX -DLOAD_PNM -DLOAD_TGA -DLOAD_XCF \
+				-DLOAD_XPM -DLOAD_XV -DLOAD_JPG -DLOAD_PNG
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
+ASFLAGS = $(CFLAGS)
+
+LIBDIR  =
+LIBS = -lSDL2 -lGL -lGLU -lglut -lz \
+         -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsphttp -lpspssl -lpspwlan \
+         -lpspnet_adhocmatching -lpspnet_adhoc -lpspnet_adhocctl -lm -lpspvram 
+
+PSPSDK=$(shell psp-config --pspsdk-path)
+include $(PSPSDK)/lib/build.mak
